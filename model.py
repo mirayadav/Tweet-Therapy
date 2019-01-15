@@ -35,30 +35,33 @@ class TwitterClient(object):
 		else:
 			return 'negative'
 
-	def get_tweets(self, query, count = 50):
+	def get_tweets(self, user, count= 2000):
 		#get and parse tweets 
 		tweets = []
-		
-		try:
-			fetched_tweets = self.api.search(q = query, count = count)
-			for tweet in fetched_tweets:
-				parsed_tweet = {}
-				parsed_tweet['text'] = tweet.text
-				parsed_tweet['sentiment'] = self.get_tweet_sentiment(tweet.text)
-				if tweet.retweet_count > 0:
-					if parsed_tweet not in tweets:
+		no_of_pages = 30
+		for i in xrange(no_of_pages):
+			try:
+				fetched_tweets = self.api.user_timeline(screen_name = user, page = i)
+				for tweet in fetched_tweets:
+					parsed_tweet = {}
+					parsed_tweet['text'] = tweet.text
+					parsed_tweet['sentiment'] = self.get_tweet_sentiment(tweet.text)
+					if tweet.retweet_count > 0:
+						if parsed_tweet not in tweets:
+							tweets.append(parsed_tweet)
+					else:
 						tweets.append(parsed_tweet)
-				else:
-					tweets.append(parsed_tweet)
-			return tweets
 
-		except tweepy.TweepError as e:
-			print("Error: " + str(e))
+			except tweepy.TweepError as e:
+				print("Error: " + str(e))
+
+		return tweets
 
 def main():
 	api = TwitterClient()
-	user_name = 'Donald Trump';
-	tweets = api.get_tweets(query = user_name, count = 200)
+	user_name = 'realDonaldTrump';
+	tweets = api.get_tweets(user = user_name, count = 1000)
+	print("Number of Tweets: {}".format(len(tweets)))
 	
 	#Sort positive, neutral, and negative tweets
 	pos_tweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
