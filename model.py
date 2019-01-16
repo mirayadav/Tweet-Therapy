@@ -1,7 +1,11 @@
 import re
 import tweepy
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import datetime as dt
 from tweepy import OAuthHandler
-from textblob import TextBlob 
+from textblob import TextBlob
 
 class TwitterClient(object):
 	#connecting to twitter API
@@ -28,59 +32,51 @@ class TwitterClient(object):
 	def get_tweet_sentiment(self,tweet):
 		#classify sentiment using TextBlob
 		analysis = TextBlob(self.clean_tweet(tweet))
-		if analysis.sentiment.polarity > 0:
-			return 'positive'
-		elif analysis.sentiment.polarity == 0:
-			return 'neutral'
-		else:
-			return 'negative'
+		return analysis.sentiment.polarity
 
 	def get_tweets(self, user, count= 2000):
 		#get and parse tweets 
 		tweets = []
-		no_of_pages = 30
+		dates = []
+		no_of_pages = 15
 		for i in xrange(no_of_pages):
 			try:
 				fetched_tweets = self.api.user_timeline(screen_name = user, page = i)
 				for tweet in fetched_tweets:
 					parsed_tweet = {}
-					parsed_tweet['text'] = tweet.text
-					parsed_tweet['sentiment'] = self.get_tweet_sentiment(tweet.text)
 					if tweet.retweet_count > 0:
 						if parsed_tweet not in tweets:
-							tweets.append(parsed_tweet)
+							tweets.append(self.get_tweet_sentiment(tweet.text))
+							dates.append(tweet.created_at)
 					else:
-						tweets.append(parsed_tweet)
+						tweets.append(self.get_tweet_sentiment(tweet.text))
+						dates.append(tweet.created_at)
 
 			except tweepy.TweepError as e:
 				print("Error: " + str(e))
 
-		return tweets
+		return tweets, dates
 
 def main():
 	api = TwitterClient()
 	user_name = 'realDonaldTrump';
-	tweets = api.get_tweets(user = user_name, count = 1000)
+	tweets, dates = api.get_tweets(user = user_name, count = 1000)
 	print("Number of Tweets: {}".format(len(tweets)))
 	
 	#Sort positive, neutral, and negative tweets
-	pos_tweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
+	pos_tweets = [tweet for tweet in tweets if tweet > 0]
 	print("Positive tweets percentage: {} %".format(100*len(pos_tweets)/len(tweets)))
-	neg_tweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
+	neg_tweets = [tweet for tweet in tweets if tweet < 0]
 	print("Negative tweets percentage: {} %".format(100*len(neg_tweets)/len(tweets)))
-	neutral_tweets = [tweet for tweet in tweets if tweet['sentiment'] == 'neutral']
+	neutral_tweets = [tweet for tweet in tweets if tweet == 0]
 	print("Neutral tweets percentage: {} %".format(100*len(neutral_tweets)/len(tweets)))
-	
 
-	print("\n\nPositive tweets:")
-	for tweet in pos_tweets[:10]:
-		print(tweet['text'])
-	print("\n\nNegative tweets:")
-	for tweet in neg_tweets[:10]:
-		print(tweet['text'])
-	print("\n\nNeutral tweets:")
-	for tweet in neutral_tweets[:10]:
-		print(tweet['text'])
+	for date in dates[:10]:
+		print(date)
+	
+	dates = [pd.to_datetime(d) for d in dates]
+	plt.scatter(dates, tweets, s =50, c = 'red')
+	plt.show()
 
 if __name__ == "__main__":
 	main()
