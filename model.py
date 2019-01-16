@@ -59,7 +59,7 @@ class TwitterClient(object):
 
 def main():
 	api = TwitterClient()
-	user_name = 'realDonaldTrump';
+	user_name = 'katyperry';
 	tweets, dates = api.get_tweets(user = user_name, count = 1000)
 	print("Number of Tweets: {}".format(len(tweets)))
 	
@@ -71,11 +71,13 @@ def main():
 	neutral_tweets = [tweet for tweet in tweets if tweet == 0]
 	print("Neutral tweets percentage: {} %".format(100*len(neutral_tweets)/len(tweets)))
 
-	for date in dates[:10]:
-		print(date)
-	
+
 	dates = [pd.to_datetime(d) for d in dates]
-	plt.scatter(dates, tweets, s =50, c = 'red')
+
+	plt.scatter(dates, tweets, c=tweets)
+	plt.xlabel('Date')
+	plt.ylabel('Sentiment')
+	plt.title("@" + user_name + "'s Mood Overtime from Tweets")
 	plt.show()
 
 if __name__ == "__main__":
