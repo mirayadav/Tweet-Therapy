@@ -1,7 +1,7 @@
 import re
 import tweepy
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt, mpld3
 import numpy as np
 import datetime as dt
 from tweepy import OAuthHandler
@@ -74,11 +74,14 @@ def main():
 
 	dates = [pd.to_datetime(d) for d in dates]
 
+	plt.figure(figsize=(10,6))
 	plt.scatter(dates, tweets, c=tweets)
 	plt.xlabel('Date')
 	plt.ylabel('Sentiment')
 	plt.title("@" + user_name + "'s Mood Overtime from Tweets")
+	plt.savefig('my_plot.png')
 	plt.show()
+
 
 if __name__ == "__main__":
 	main()
