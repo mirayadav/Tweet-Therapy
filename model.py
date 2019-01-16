@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt, mpld3
 import numpy as np
 import datetime as dt
+import base64
+from io import BytesIO
 from tweepy import OAuthHandler
 from textblob import TextBlob
 from flask import Flask, render_template, request, url_for, redirect
@@ -18,9 +20,9 @@ def index():
 def graph():
 	if request.method == 'POST':
 		text1 = request.form['text1']
-		generate_graph(text1)
+		results = generate_graph(text1)
 		title = "@" + text1 + "'s Mood in Tweets"
-		return render_template('graph.html', name=title, url = "../static/my_plot.png")
+		return render_template('graph.html', name=title, url = results)
 
 class TwitterClient(object):
 	#connecting to twitter API
@@ -92,8 +94,14 @@ def generate_graph(user_name = " "):
 	plt.scatter(dates, tweets, c=tweets)
 	plt.xlabel('Tweet Date')
 	plt.ylabel('Mood')
-	plt.title("@" + user_name + "'s Mood in Tweets")
-	plt.savefig('static/my_plot.png')
+	#plt.title("@" + user_name + "'s Mood in Tweets")
+	figfile = BytesIO()
+	plt.savefig(figfile, format='png')
+	figfile.seek(0)
+	figdata_png = base64.b64encode(figfile.getvalue())
+	return figdata_png
+
+
 
 
 if __name__ == "__main__":
