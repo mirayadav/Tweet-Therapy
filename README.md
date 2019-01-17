@@ -6,6 +6,11 @@
 git clone https://github.com/mirayadav/Tweet-Therapy
 cd Tweet-Therapy
 pip install -r requirements.txt
+```
+
+Before running the app, you must create your own Twitter API keys and store them in a config.py file (formatted like sample_config.py).
+
+```
 export FLASK_APP=model.py
 flask run
 ```
