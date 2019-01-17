@@ -8,7 +8,7 @@ cd Tweet-Therapy
 pip install -r requirements.txt
 ```
 
-Before running the app, you must create your own Twitter API keys and store them in a config.py file (formatted like sample_config.py).
+Before running the app, you must create your own Twitter API keys and store them in a config.py file (formatted like sample_config.py). Then you can run the app by:
 
 ```
 export FLASK_APP=model.py
