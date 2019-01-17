@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt, mpld3
 import numpy as np
 import datetime as dt
 import base64
+import config
 from io import BytesIO
 from tweepy import OAuthHandler
 from textblob import TextBlob
@@ -27,16 +28,10 @@ def graph():
 class TwitterClient(object):
 	#connecting to twitter API
 	def __init__(self):
-		#constructor
-		consumer_key = 'hErizb29LAeLUUms8izUTozHz'
-		consumer_secret = 'IgOq53bGtfCOJrQYxGjTa7LqHCWdgs5y1YcjKzKa5VKFbwTsvb'
-		access_token = '773659966267875328-V4Tb1swk6jEpmHvWQCxcehyvz1lVDkd'
-		access_token_secret = 'G0nP4RhIQPTVo63vD2o6zSkye9UPoOHQLMtU74mEgAhtk'
-
 		#attempt authentication
 		try:
-			self.auth = OAuthHandler(consumer_key, consumer_secret)
-			self.auth.set_access_token(access_token, access_token_secret)
+			self.auth = OAuthHandler(config.consumer_key, config.consumer_secret)
+			self.auth.set_access_token(config.access_token, config.access_token_secret)
 			self.api = tweepy.API(self.auth)
 
 		except:
