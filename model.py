@@ -1,6 +1,8 @@
 import re
 import tweepy
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt, mpld3
 import numpy as np
 import datetime as dt
@@ -21,9 +23,11 @@ def index():
 def graph():
 	if request.method == 'POST':
 		text1 = request.form['text1']
-		results = generate_graph(text1)
-		title = "@" + text1 + "'s Mood in Tweets"
-		return render_template('graph.html', name=title, url = results)
+		results, pos, neg, neutral = generate_graph(text1)
+		tot = 100-pos-neg-neutral
+		neutral = neutral+tot
+		title = "@" + text1 + "'s Mood Analyzed From Tweets"
+		return render_template('graph.html', name=title, url = results, p = pos, n = neg, t = neutral)
 
 class TwitterClient(object):
 	#connecting to twitter API
@@ -76,11 +80,11 @@ def generate_graph(user_name = " "):
 	
 	#Sort positive, neutral, and negative tweets
 	pos_tweets = [tweet for tweet in tweets if tweet > 0]
-	print("Positive tweets percentage: {} %".format(100*len(pos_tweets)/len(tweets)))
+	pos_tweet_percentage = 100*len(pos_tweets)/len(tweets)
 	neg_tweets = [tweet for tweet in tweets if tweet < 0]
-	print("Negative tweets percentage: {} %".format(100*len(neg_tweets)/len(tweets)))
+	neg_tweet_percentage = 100*len(neg_tweets)/len(tweets)
 	neutral_tweets = [tweet for tweet in tweets if tweet == 0]
-	print("Neutral tweets percentage: {} %".format(100*len(neutral_tweets)/len(tweets)))
+	neutral_tweet_percentage = 100*len(neutral_tweets)/len(tweets)
 
 
 	dates = [pd.to_datetime(d) for d in dates]
@@ -94,9 +98,8 @@ def generate_graph(user_name = " "):
 	plt.savefig(figfile, format='png')
 	figfile.seek(0)
 	figdata_png = base64.b64encode(figfile.getvalue())
-	return figdata_png
-
-
+	
+	return figdata_png, pos_tweet_percentage, neg_tweet_percentage, neutral_tweet_percentage
 
 
 if __name__ == "__main__":
