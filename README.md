@@ -1,5 +1,5 @@
 # Tweet Therapy
-FLASK app that implements the Twitter API and conducts sentiment analysis on a user's tweets to plot their mood over time. 
+FLASK app that implements Twitter's API and conducts sentiment analysis on a user's tweets to plot their mood over time. 
 
 ## Demo
 
